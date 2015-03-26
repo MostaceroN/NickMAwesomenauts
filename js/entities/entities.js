@@ -12,6 +12,7 @@ game.PlayerEntity = me.Entity.extend({
         }]);
     
     this.body.setVelocity(5, 20);
+    this.facing = "right";
     me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
     
     this.renderable.addAnimation("idle", [78]);
@@ -24,8 +25,10 @@ game.PlayerEntity = me.Entity.extend({
     update: function(delta){
         if(me.input.isKeyPressed("right")){
             this.body.vel.x += this.body.accel.x * me.timer.tick;
+            this.facing = "right";
             this.flipX(true);
         }else if(me.input.isKeyPressed("left")){
+            this.facing = "left";
             this.body.vel.x -=this.body.accel.x * me.timer.tick;
             this.flipX(false);
             
@@ -34,7 +37,7 @@ game.PlayerEntity = me.Entity.extend({
         }
         
         if(me.input.isKeyPressed("jump" && !this.jumping && !this.falling)){
-            this.jumping = true;
+            this.body.jumping = true;
             this.body.vel.y -= this.body.accel.y * me.timer.tick;
         }
         
@@ -58,11 +61,33 @@ game.PlayerEntity = me.Entity.extend({
             }
             
         }
-    
+        me.collision.check(this, true, this.collideHandler.bind(this), true);
         this.body.update(delta);
         
         this._super(me.Entity, "update", [delta]);
         return true;
+    },
+    
+    collideHandler: function(response){
+        if(response.b.type==='EnemyBaseEntity'){
+            var ydif = this.pos.y - response.b.pos.y;
+            var xdif = this.pos.x -respoonse.b.pos.x;
+            
+            
+            
+            if(ydif<-40 && xdif<70 && xdif>-35){
+                this.body.falling = false;
+                this.body.vel.y = -1;
+            }
+            else if(xdif>35 && this.facing==='right' && (xdif<0)){
+                this.body.vel.x = 0;
+                this.pos.x = this.pos.x -1;
+            }else if(xdif<70 && this.facing==='left' && xdif>0){
+                this.body.vel.x = 0;
+                this.pos.x = this.pos.x +1;
+            }}
+         
+        }
     }
 });
 
